@@ -5,7 +5,7 @@ import requests
 workouts = []
 workout_id = 0
 
-OPENWEATHER_API_KEY = 'your_openweather_api_key'
+OPENWEATHER_API_KEY = 'ae2477cdd15db41a35ac1d365656c02c'
 OPENWEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 
 def fetch_weather(latitude, longitude):

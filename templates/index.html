@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MileSteps Workout Tracker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>MileSteps Dashboard</h1>
+    <div class="my-4">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addWorkoutModal">Add Workout</button>
+        <input type="text" id="searchNickname" placeholder="Search by nickname..." class="form-control my-2" oninput="searchWorkouts()">
+        <div class="d-flex justify-content-start my-2">
+            <input type="date" id="filterStartDate" class="form-control mx-2">
+            <input type="date" id="filterEndDate" class="form-control mx-2">
+            <button class="btn btn-info mx-2" onclick="filterWorkoutsByDate()">Filter by Date</button>
+        </div>
+        <button class="btn btn-info my-1" onclick="loadSummary('weekly')">Weekly Summary</button>
+        <button class="btn btn-info my-1" onclick="loadSummary('monthly')">Monthly Summary</button>
+    </div>
+    <ul id="workoutsList" class="list-group"></ul>
+</div>
+
+<!-- Add Workout Modal -->
+<div class="modal fade" id="addWorkoutModal" tabindex="-1" aria-labelledby="addWorkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addWorkoutModalLabel">Add New Workout</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addWorkoutForm">
+          <div class="form-group">
+            <label for="date">Date and Time:</label>
+            <input type="datetime-local" id="date" name="date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="duration">Duration (minutes):</label>
+            <input type="number" id="duration" name="duration" class="form-control" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="distance">Distance (km):</label>
+            <input type="number" id="distance" name="distance" class="form-control" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="nickname">Route Nickname:</label>
+            <input type="text" id="nickname" name="nickname" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="image">Upload Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" class="form-control-file">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="addWorkout()">Save Workout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+document.getElementById('addWorkoutForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting through the browser
+    addWorkout();
+});
+
+function addWorkout() {
+    let formData = new FormData(document.getElementById('addWorkoutForm'));
+    const imageFile = document.getElementById('image').files[0];
+    if (imageFile) {
+        // Convert image to base64 and append to formData if necessary
+        // Note: Actual conversion to base64 might need to happen on the server-side
+        formData.append('image', imageFile);
+    }
+
+    fetch('/workouts', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Workout added successfully!");
+        $('#addWorkoutModal').modal('hide'); // Close the modal
+        loadWorkouts(); // Optionally, refresh the list of workouts
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function searchWorkouts() {
+    const nickname = document.getElementById('searchNickname').value;
+    fetch(`/workouts/search?nickname=${nickname}`)
+    .then(response => response.json())
+    .then(workouts => displayWorkouts(workouts))
+    .catch(error => console.error('Error:', error));
+}
+
+function filterWorkoutsByDate() {
+    const startDate = document.getElementById('filterStartDate').value;
+    const endDate = document.getElementById('filterEndDate').value;
+    fetch(`/workouts/filter?start_date=${startDate}&end_date=${endDate}`)
+    .then(response => response.json())
+    .then(workouts => displayWorkouts(workouts))
+    .catch(error => console.error('Error:', error));
+}
+
+function loadSummary(summaryType = 'monthly') {
+    fetch(`/workouts/summary?summary_type=${summaryType}`)
+    .then(response => response.json())
+    .then(summary => console.log(summary)) // Implement displaying the summary
+    .catch(error => console.error('Error:', error));
+}
+
+function loadWorkouts() {
+    fetch('/workouts')
+    .then(response => response.json())
+    .then(workouts => displayWorkouts(workouts))
+    .catch(error => console.error('Error:', error));
+}
+
+function displayWorkouts(workouts) {
+    const workoutsList = document.getElementById('workoutsList');
+    workoutsList.innerHTML = ''; // Clear existing workouts
+    workouts.forEach(workout => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        let content = `Date: ${workout.date}, Distance: ${workout.distance} km, Duration: ${workout.duration} min, Nickname: ${workout.nickname}`;
+        if (workout.image) {
+            content += `<br><img src="data:image/jpeg;base64,${workout.image}" style="width:100px;">`;
+        }
+        li.innerHTML = content;
+        workoutsList.appendChild(li);
+    });
+}
+
+window.onload = function() {
+    loadWorkouts();
+    loadSummary(); 
+};
+</script>
+</body>
+</html>
+
+

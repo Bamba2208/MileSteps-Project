@@ -37,25 +37,42 @@ MileSteps is a REST API and web application for tracking running workouts. Users
    cd MileSteps-Project
 ## API Endpoints
  Create a New Workout Record
-URL: POST http://localhost:5000/workouts
+URL: POST http://localhost:5001/workouts.
+
 Request Body: JSON containing workout details.
+
 Response: JSON indicating success or failure.
+
 Retrieve All Workout Records
-URL: GET http://localhost:5000/workouts
+
+URL: GET http://localhost:5001/workouts
+
 Response: JSON array of all workout records.
+
 Filter Workout Records by Date Range
-URL: GET http://localhost:5000/workouts/filter?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
+URL: GET http://localhost:5001/workouts/filter?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
+
 Request Parameters: start_date (start date) and end_date (end date).
+
 Response: JSON array of filtered workout records.
+
 Retrieve Aggregated Summary Data
-URL: GET http://localhost:5000/workouts/summary
-URL for Weekly Summary: GET http://localhost:5000/workouts/summary?summary_type=weekly
+
+URL: GET http://localhost:5001/workouts/summary
+
+URL for Weekly Summary: GET http://localhost:5001/workouts/summary?summary_type=weekly
+
 Response: JSON containing aggregated statistics.
 Search Workout Records
-URL: GET http://localhost:5000/workouts/search?nickname=Nickname
+
+URL: GET http://localhost:5001/workouts/search?nickname=Nickname
+
 Request Parameter: nickname (nickname to search for).
+
 Response: JSON array of matching workout records.
+
 Web Interface
+
 Access the web interface for the MileSteps Workout Tracker by opening this URL in a web browser:
 
-URL: http://localhost:5000/
+URL: http://localhost:5001/
